@@ -100,5 +100,19 @@ namespace Niver.Core.Infrastructure.Repositories
                 return data;
             }
         }
+
+        public IList<Colaborador> Filtrar(int mes, int dia)
+        {
+            using (var conexao = new NpgsqlConnection(_conexao))
+            {
+                var data = conexao.Query<Colaborador>(ColaboradorQuery.Filtrar(mes, dia), new
+                {
+                    Mes = mes,
+                    Dia = dia
+                }).ToList();
+
+                return data;
+            }
+        }
     }
 }

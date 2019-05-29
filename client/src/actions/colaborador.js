@@ -1,5 +1,8 @@
 import {
-  ADD_ERROR, ADD_REBELDE, FETCH_REBELDE, UPDATE_REBELDE,
+  ADD_ERROR,
+  ADD_REBELDE,
+  FETCH_REBELDE,
+  UPDATE_REBELDE,
 } from '.';
 
 import enviroment from '../enviroment';
@@ -12,16 +15,13 @@ export const addColaborador = colaborador => dispatch => new Promise((resolve, r
   })
     .then((response) => {
       if (response.status == 201) {
-        return response.json();
+        return response;
       }
       throw response.json();
     })
-    .then((data) => {
-      dispatch({
-        type: ADD_REBELDE,
-        colaborador: data,
-      });
-      resolve(data);
+    .then(() => {
+      dispatch(fetchColaborador());
+      resolve();
     })
     .catch((err) => {
       err.then((error) => {
@@ -35,16 +35,16 @@ export const addColaborador = colaborador => dispatch => new Promise((resolve, r
 });
 
 export const updateColaborador = colaborador => dispatch => new Promise((resolve, reject) => {
-  fetch(`${enviroment.apiUrl}colaborador`, {
+  fetch(`${enviroment.apiUrl}colaborador/${colaborador.uuid}`, {
     method: 'put',
     body: JSON.stringify(colaborador),
     headers: { 'Content-Type': 'application/json' },
   })
     .then((response) => {
       if (response.status == 200) {
-        return response.json();
+        return response;
       }
-      throw response.json();
+      throw response;
     })
     .then(() => {
       dispatch(fetchColaborador());
@@ -95,6 +95,23 @@ export const fetchColaborador = () => (dispatch) => {
         return response.json();
       }
       throw response.json();
+    })
+    .then(data => dispatch({
+      type: FETCH_REBELDE,
+      colaborador: data,
+    }));
+};
+
+export const filterColaborador = (mes, dia) => (dispatch) => {
+  fetch(`${enviroment.apiUrl}colaborador/filtro?mes=${mes}&dia=${dia}`, {
+    method: 'get',
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((response) => {
+      if (response.status == 200) {
+        return response.json();
+      }
+      return [];
     })
     .then(data => dispatch({
       type: FETCH_REBELDE,

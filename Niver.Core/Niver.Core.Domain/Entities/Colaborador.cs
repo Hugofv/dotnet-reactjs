@@ -11,7 +11,7 @@ namespace Niver.Core.Domain.Entities
 
         public DateTime Nascimento { get; set; }
 
-        public byte[] Foto { get; set; }
+        public string Foto { get; set; }
 
         public string Descricao { get; set; }
     }

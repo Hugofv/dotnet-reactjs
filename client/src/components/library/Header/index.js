@@ -11,4 +11,5 @@ export default styled.div`
   position: fixed;
   width: 100%;
   z-index: 1;
+  padding-right: 200px;
 `;

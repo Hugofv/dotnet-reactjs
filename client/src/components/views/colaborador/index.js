@@ -1,16 +1,18 @@
+import { BoxFilter, BoxSelect } from './styles';
 import {
   Divider,
   Icon,
   Modal,
   Row,
+  Select,
   Table,
-  Tag,
 } from 'antd';
 import React, { Component } from 'react';
 import {
   addColaborador,
   deleteColaborador,
   fetchColaborador,
+  filterColaborador,
   updateColaborador,
 } from '../../../actions/colaborador';
 
@@ -18,17 +20,25 @@ import { Button } from '../../library';
 import Form from './form';
 import Page from '../Page';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 const { confirm } = Modal;
+const { Option } = Select;
 
 class Colaborador extends Component {
   constructor(props) {
     super(props);
-    this.state = { visible: false, colaborador: {} };
+    this.state = {
+      visible: false,
+      colaborador: {},
+      mes: '0',
+      dia: '0',
+    };
 
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.showDeleteConfirm = this.showDeleteConfirm.bind(this);
+    this.handleChange = this.handleChange.bind(this);
 
     document.title = 'Colaborador';
   }
@@ -61,7 +71,7 @@ class Colaborador extends Component {
       okType: 'danger',
       cancelText: 'Não',
       onOk() {
-        deleteColaborador(colaborador._id).then(() => {
+        deleteColaborador(colaborador.uuid).then(() => {
           toastManager.add('Colaborador excluído com sucesso.', {
             appearance: 'success',
             autoDismiss: true,
@@ -73,8 +83,23 @@ class Colaborador extends Component {
     });
   }
 
+  handleChange(item, value) {
+
+    this.setState({
+      [item]: value,
+    }, () => {
+      if(parseInt(this.state.mes) > 0 || parseInt(this.state.dia)) {
+        this.props.filterColaborador(this.state.mes, this.state.dia)
+      } else {
+        this.props.fetchColaborador()
+      }
+    });
+  }
+
   render() {
-    const { addColaborador, updateColaborador, colaborador } = this.props;
+    const { addColaborador, updateColaborador, colaborador, toastManager } = this.props;
+    const { mes, dia } = this.state;
+
     const columns = [
       {
         title: 'Nome',
@@ -82,33 +107,15 @@ class Colaborador extends Component {
         key: 'nome',
       },
       {
-        title: 'Idade',
-        dataIndex: 'idade',
-        key: 'idade',
+        title: 'Descrição',
+        dataIndex: 'descricao',
+        key: 'descricao',
       },
       {
-        title: 'Gênero',
-        key: 'genero',
-        dataIndex: 'genero',
-        render: genero => (
-          <span>
-            {
-              <Tag color={genero == 'masculino' ? 'geekblue' : 'green'} key={genero}>
-                {genero.toUpperCase()}
-              </Tag>
-            }
-          </span>
-        ),
-      },
-      {
-        title: 'Latitude',
-        dataIndex: 'localizacao.latitude',
-        key: 'latitude',
-      },
-      {
-        title: 'Longitude',
-        dataIndex: 'localizacao.longitude',
-        key: 'longitude',
+        title: 'Data de Nascimento',
+        dataIndex: 'nascimento',
+        key: 'nascimento',
+        render: text => moment(text).format('DD/MM/YYYY'),
       },
       {
         title: 'Ação',
@@ -135,7 +142,46 @@ class Colaborador extends Component {
 
     return (
       <Page>
-        <Row type="flex" justify="end">
+        <Row type="flex" justify="space-between" align="middle">
+          <BoxFilter>
+            <h3>Filtro</h3>
+            <BoxSelect>
+              <span style={{ paddingLeft: '.4em' }}>Dia</span>
+              <Select
+                style={{ width: 90 }}
+                value={dia}
+                onChange={value => this.handleChange('dia', value)}
+              >
+                <Option value='0'>Todos</Option>
+                {[...Array(31).keys()].map(e => (
+                  <Option value={e + 1}> {e + 1}</Option>
+                ))}
+              </Select>
+            </BoxSelect>
+
+            <BoxSelect>
+              <span style={{ paddingLeft: '.4em' }}>Mês</span>
+              <Select
+                style={{ width: 120 }}
+                value={mes}
+                onChange={value => this.handleChange('mes', value)}
+              >
+                <Option value="0">Todos</Option>
+                <Option value="1">Janeiro</Option>
+                <Option value="2">Fevereiro</Option>
+                <Option value="3">Março</Option>
+                <Option value="4">Abril</Option>
+                <Option value="5">Maio</Option>
+                <Option value="6">Junho</Option>
+                <Option value="7">Julho</Option>
+                <Option value="8">Agosto</Option>
+                <Option value="9">Setembro</Option>
+                <Option value="10">Outubro</Option>
+                <Option value="11">Novembro</Option>
+                <Option value="12">Dezembro</Option>
+              </Select>
+            </BoxSelect>
+          </BoxFilter>
           <Button primary onClick={() => this.showModal()}>
             <Icon type="plus" />
             Cadastrar
@@ -154,7 +200,7 @@ class Colaborador extends Component {
             addColaborador={addColaborador}
             updateColaborador={updateColaborador}
             colaborador={this.state.colaborador}
-            toastManager={this.props.toastManager}
+            toastManager={toastManager}
           />
         </Modal>
 
@@ -178,5 +224,6 @@ export default connect(
     updateColaborador,
     fetchColaborador,
     deleteColaborador,
+    filterColaborador,
   },
 )(Colaborador);

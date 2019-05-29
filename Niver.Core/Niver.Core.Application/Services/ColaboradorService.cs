@@ -34,5 +34,10 @@ namespace Niver.Core.Application.Services
         {
             return _colaboradorRepository.Listar();
         }
+
+        public IList<Colaborador> Filtrar(int mes, int dia)
+        {
+            return _colaboradorRepository.Filtrar(mes, dia);
+        }
     }
 }

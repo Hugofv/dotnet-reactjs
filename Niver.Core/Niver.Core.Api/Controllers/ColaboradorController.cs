@@ -88,7 +88,7 @@ namespace Niver.Core.Api.Controllers
         }
 
         /// <summary>
-        /// Busca todos os clientes cadastrados
+        /// Busca todos os colaboradores cadastrados
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -97,6 +97,29 @@ namespace Niver.Core.Api.Controllers
             try
             {
                 var resultado = _colaboradorService.Listar();
+                if (resultado.Any())
+                {
+                    return new ObjectResult(resultado);
+                }
+                return new NoContentResult();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                return new BadRequestResult();
+            }
+        }
+
+        /// <summary>
+        /// Filtra os colaboradores cadastrados
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("filtro")]
+        public IActionResult Filtrar(int mes, int dia)
+        {
+            try
+            {
+                var resultado = _colaboradorService.Filtrar(mes, dia);
                 if (resultado.Any())
                 {
                     return new ObjectResult(resultado);

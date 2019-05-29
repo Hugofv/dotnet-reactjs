@@ -36,7 +36,15 @@ const Page = props => (
           {props.children}
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
+      <Footer
+        style={{
+          textAlign: 'center',
+          bottom: 0,
+          position: 'fixed',
+          width: '100%',
+          paddingRight: '200px',
+        }}
+      >
         Starwars ©2019 Created by Hugo Fernandes
       </Footer>
     </Layout>

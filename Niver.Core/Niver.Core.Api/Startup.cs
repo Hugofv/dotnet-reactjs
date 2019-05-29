@@ -29,7 +29,7 @@ namespace Niver.Core.Api
             {
                 options.AddPolicy("NiverPolicy",
                     builder => builder.WithOrigins(
-                            "http://localhost:3000"
+                            "http://localhost:8080"
                         )
                         .AllowAnyMethod()
                         .AllowAnyHeader()

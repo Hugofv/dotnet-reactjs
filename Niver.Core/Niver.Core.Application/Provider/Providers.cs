@@ -10,8 +10,8 @@ namespace Niver.Core.Application.Provider
     {
         public static void Registro(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<IClienteService, ClienteService>();
-            serviceCollection.AddScoped<IClienteRepository, ClienteRepository>();
+            serviceCollection.AddScoped<IColaboradorService, ColaboradorService>();
+            serviceCollection.AddScoped<IColaboradorRepository, ColaboradorRepository>();
         }
     }
 }

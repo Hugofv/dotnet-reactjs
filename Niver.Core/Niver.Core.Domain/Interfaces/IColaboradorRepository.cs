@@ -10,5 +10,6 @@ namespace Niver.Core.Domain.Interfaces
         bool Atualizar(Colaborador colaborador, Guid uuid);
         bool Excluir(Guid uuid);
         IList<Colaborador> Listar();
+        IList<Colaborador> Filtrar(int mes, int dia);
     }
 }

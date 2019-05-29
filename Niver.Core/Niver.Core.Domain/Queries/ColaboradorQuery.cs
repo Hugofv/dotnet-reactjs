@@ -3,66 +3,55 @@
     public class ColaboradorQuery
     {
         public static string Cria => @"
-            INSERT INTO ""Cliente"" (""Nome"", ""PessoaFisicaId"", ""PessoaJuridicaId"") 
-            VALUES (@Nome, @PessoaFisicaId, @PessoaJuridicaId)
+            INSERT INTO ""colaborador"" (nome, foto, nascimento, descricao) 
+            VALUES (@Nome, @Foto, @Nascimento, @Descricao)
         ";
 
         public static string Atualiza => @"
-            UPDATE ""Cliente"" SET ""Nome"" = @Nome WHERE ""Uuid"" = @Uuid
+            UPDATE colaborador SET nome = @Nome, foto = @Foto, nascimento = @Nascimento, descricao = @Descricao WHERE uuid = @Uuid
         ";
 
         public static string Excluir => @"
-            UPDATE ""Cliente"" SET ""Ativo"" = FALSE WHERE ""Uuid"" = @Uuid;
-        ";
-
-        public static string CriaPessoaFisica => @"
-            INSERT INTO ""PessoaFisica"" (""Cpf"", ""DataNascimento"") 
-            VALUES (@Cpf, @DataNascimento)
-            RETURNING ""Id""
-        ";
-
-        public static string CriaPessoaJuridica => @"
-            INSERT INTO ""PessoaJuridica"" (""Cnpj"", ""RazaoSocial"")
-            VALUES (@Cnpj, @RazaoSocial)
-            RETURNING ""Id""
-        ";
-
-        public static string AtualizaPessoaFisica => @"
-            UPDATE ""PessoaFisica"" SET ""Cpf"" = @Cpf, ""DataNascimento"" = @DataNascimento WHERE ""Id"" = @PessoaFisicaId;
-        ";
-
-        public static string AtualizaPessoaJuridica => @"
-            UPDATE ""PessoaJuridica"" SET ""Cnpj"" = @Cnpj, ""RazaoSocial"" = @RazaoSocial WHERE ""Id"" = @PessoaJuridicaId;
-        ";
-
-        public static string ExcluirPessoaFisica => @"
-            UPDATE ""PessoaFisica"" pf SET ""Ativo"" = FALSE
-            FROM ""Cliente"" cli WHERE cli.""PessoaFisicaId"" = pf.""Id""
-            AND cli.""Uuid"" = @Uuid;
-        ";
-
-        public static string ExcluirPessoaJuridica => @"
-            UPDATE ""PessoaJuridica"" pf SET ""Ativo"" = FALSE
-            FROM ""Cliente"" cli WHERE cli.""PessoaJuridicaId"" = pf.""Id""
-            AND cli.""Uuid"" = @Uuid;
+            UPDATE colaborador SET ativo = FALSE WHERE uuid = @Uuid;
         ";
 
         public static string Listar => @"
             SELECT
-	            cli.""Id"",
-	            cli.""Uuid"",
-	            cli.""Nome"",
-	            pf.""Id"",
-	            pf.""Cpf"",
-	            pf.""DataNascimento"",
-	            pj.""Id"",
-	            pj.""Cnpj"",
-	            pj.""RazaoSocial""
-            FROM ""Cliente"" cli
-            LEFT JOIN ""PessoaFisica"" pf ON pf.""Id"" = cli.""PessoaFisicaId"" AND pf.""Ativo"" IS TRUE
-            LEFT JOIN ""PessoaJuridica"" pj ON pj.""Id"" = cli.""PessoaJuridicaId"" AND pj.""Ativo"" IS TRUE
-            WHERE cli.""Ativo"" IS TRUE
-            ORDER BY cli.""Nome"";
+	            col.id AS ""Id"",
+	            col.uuid AS ""Uuid"",
+                col.nome AS ""Nome"",
+                col.descricao AS ""Descricao"",
+	            col.foto AS ""Foto"",
+                col.nascimento AS ""Nascimento""
+            FROM ""colaborador"" col
+            WHERE col.""ativo"" IS TRUE
+            ORDER BY col.nome;
         ";
+
+        public static string Filtrar(int mes, int dia) => $@"
+            SELECT
+                col.id AS ""Id"",
+                col.uuid AS ""Uuid"",
+                col.nome AS ""Nome"",
+                col.descricao AS ""Descricao"",
+                col.foto AS ""Foto"",
+                col.nascimento AS ""Nascimento""
+            FROM colaborador col
+                WHERE col.ativo IS TRUE
+                AND((date_part('month', col.nascimento)::int) = @Mes
+            {CondicaoFiltro(mes, dia)}
+                (date_part('day', col.nascimento)::int) = @Dia)
+            ORDER BY col.nome;
+        ";
+
+        private static string CondicaoFiltro(int mes, int dia)
+        {
+            if (mes > 0 && dia > 0)
+            {
+                return "AND";
+            }
+
+            return "OR";
+        }
     }
 }
